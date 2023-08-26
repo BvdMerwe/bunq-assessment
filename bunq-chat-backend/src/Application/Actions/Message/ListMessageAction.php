@@ -23,8 +23,8 @@ class ListMessageAction extends MessageAction
             return $this->respondWithData($errors, 400);
         }
 
-        $userId = $this->resolveArg('userId');
-        $conversationId = $this->resolveArg('conversationId');
+        $userId = (int) $this->resolveArg('userId');
+        $conversationId = (int) $this->resolveArg('conversationId');
         $conversations = $this->repository->listMessages($userId, $conversationId);
 
         $this->logger->info("Conversation list was viewed.");

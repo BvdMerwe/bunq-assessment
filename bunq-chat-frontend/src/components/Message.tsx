@@ -14,7 +14,7 @@ export default function Message({ className = '', message, timestamp, isMe = fal
       <div className="body">
         <p className="text-sm text-white/50">{name}</p>
         <main>{message}</main>
-        <span className="timestamp">{timestamp}</span>
+        <span className="timestamp">{new Date(timestamp).toDateString()}</span>
       </div>
     </div>
   );

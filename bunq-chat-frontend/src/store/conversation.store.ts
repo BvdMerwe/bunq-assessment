@@ -86,10 +86,11 @@ const useConversationStore = create<ConversationsState>((set) => ({
     const result = await fetch(`${Environment.apiBaseUrl}/api/user/1/conversation`, {
       method: 'POST',
       headers: {
+        'Content-Type': 'application/json',
         Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
       },
       body: JSON.stringify({
-        user_ids: [user.id],
+        userIds: [user.id],
       }),
     })
       .then((response) => response.json())
@@ -118,10 +119,11 @@ const useConversationStore = create<ConversationsState>((set) => ({
     const result = await fetch(`${Environment.apiBaseUrl}/api/user/1/conversation`, {
       method: 'POST',
       headers: {
+        'Content-Type': 'application/json',
         Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
       },
       body: JSON.stringify({
-        user_ids: [users.map((u) => u.id)],
+        userIds: [users.map((u) => u.id)],
         name,
       }),
     })

@@ -8,12 +8,14 @@ import { User } from '../store/user.store.ts';
 export default function Sidebar() {
   const conversationStore = useConversationStore((state) => state);
   const [openModal, setOpenModal] = useState(false);
+
   useEffect(() => {
     conversationStore.fetchAll();
   }, []);
 
-  function selectConversation(conversationId: number) {
-    conversationStore.fetch(conversationId);
+  async function selectConversation(conversationId: number) {
+    await conversationStore.fetch(conversationId);
+    await conversationStore.fetchAll();
   }
 
   function startNewConversation(user: User) {

@@ -46,7 +46,7 @@ class RemoteConversationRepository implements ConversationRepository
     {
 //        return $this->client->get("/api/user/$userId/conversation/$conversationId");
         $conversations = $this->listConversations($userId);
-        $key = array_search($userId, array_column($conversations, 'id'));
+        $key = array_search($conversationId, array_column($conversations, 'id'));
         return $conversations[$key];
     }
 

@@ -7,6 +7,7 @@ use App\Domain\Conversation\ConversationRepository;
 use App\Domain\Message\MessageRepository;
 use App\Infrastructure\Persistence\AuthenticatedUser\InMemoryAuthenticatedUserRepository;
 use App\Infrastructure\Remote\Conversation\RemoteConversationRepository;
+use App\Infrastructure\Remote\Message\RemoteMessageRepository;
 use DI\ContainerBuilder;
 use App\Domain\User\UserRepository;
 use App\Infrastructure\Remote\User\RemoteUserRepository;
