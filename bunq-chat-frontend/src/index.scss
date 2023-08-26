@@ -1,0 +1,42 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+
+}
+
+input {
+    @apply p-2 border border-gray-300 rounded-md;
+}
+
+.btn {
+    @apply p-2 border bg-green-500 text-white rounded-md;
+
+    &.btn-rounded {
+        @apply rounded-full;
+    }
+}
+
+svg, img {
+    @apply inline-block;
+}
+
+.messages {
+    @apply bg-white flex;
+}
+.message {
+    @apply rounded-md mb-2 max-w-2xl;
+    .body {
+        @apply text-white p-2 px-3 inline-block relative pb-5;
+    }
+    &.me {
+        @apply bg-blue-500 self-end mx-2 ms-10;
+    }
+    &.you {
+        @apply bg-gray-500 self-start mx-2 me-10;
+    }
+    .timestamp {
+        @apply text-xs text-white/50 ms-2 absolute bottom-2 right-2;
+    }
+}
