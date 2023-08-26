@@ -1,57 +1,40 @@
 <?php
 
-declare(strict_types=1);
-
 namespace App\Domain\User;
 
-use JsonSerializable;
+use DateTime;
 
-class User implements JsonSerializable
+class User implements \JsonSerializable
 {
-    private ?int $id;
-
-    private string $username;
-
-    private string $firstName;
-
-    private string $lastName;
-
-    public function __construct(?int $id, string $username, string $firstName, string $lastName)
-    {
+    public function __construct(
+        ?int $id,
+        string $name,
+        DateTime $lastSeen
+    ) {
         $this->id = $id;
-        $this->username = strtolower($username);
-        $this->firstName = ucfirst($firstName);
-        $this->lastName = ucfirst($lastName);
+        $this->name = $name;
+        $this->lastSeen = $lastSeen;
     }
 
-    public function getId(): ?int
-    {
-        return $this->id;
-    }
+    private ?int $id;
+    private string $name;
+    private DateTime $lastSeen;
 
-    public function getUsername(): string
-    {
-        return $this->username;
-    }
-
-    public function getFirstName(): string
-    {
-        return $this->firstName;
-    }
-
-    public function getLastName(): string
-    {
-        return $this->lastName;
-    }
-
-    #[\ReturnTypeWillChange]
     public function jsonSerialize(): array
     {
         return [
             'id' => $this->id,
-            'username' => $this->username,
-            'firstName' => $this->firstName,
-            'lastName' => $this->lastName,
+            'name' => $this->name,
+            'last_seen_at' => $this->lastSeen->format('Y-m-d\TH:i:s.u\Z'),
         ];
+    }
+
+    public static function fromJson(array $data): User
+    {
+        return new User(
+            $data['id'],
+            $data['name'],
+            new DateTime($data['last_seen_at'])
+        );
     }
 }

@@ -12,8 +12,9 @@ export interface Conversation {
 export interface ConversationsState {
   conversation: Conversation | null;
   conversations: Conversation[];
-  fetchAll?: () => Promise<void>;
-  startConversation?: (id: User) => Promise<void>;
+  fetchAll: () => Promise<void>;
+  fetch: (conversationId: number) => Promise<void>;
+  startConversation?: (user: User) => Promise<void>;
   startGroup?: (users: User[], name: string) => Promise<void>;
 }
 
@@ -21,8 +22,12 @@ const useConversationStore = create<ConversationsState>((set) => ({
   conversation: null,
   conversations: [],
   fetchAll: async () => {
-    const result = await fetch(`${Environment.apiBaseUrl}/api/user/1/conversation`)
-      .then((response) => response.json())
+    const result = await fetch(`${Environment.apiBaseUrl}/api/user/1/conversation`, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+      },
+    })
+      .then((response) => (response.ok ? response.json() : Promise.reject(response)))
       .then((data: ConversationsDto) => data)
       .catch((err) => {
         console.error(err);
@@ -33,10 +38,10 @@ const useConversationStore = create<ConversationsState>((set) => ({
       conversations: result.data.map(
         (conversation) =>
           <Conversation>{
-            id: conversation.data.id,
-            name: conversation.data.name,
+            id: conversation.id,
+            name: conversation.name,
             members:
-              conversation.data.members?.map((m) => ({
+              conversation.members?.map((m) => ({
                 id: m.data.id,
                 name: m.data.name,
               })) ?? [],
@@ -44,16 +49,51 @@ const useConversationStore = create<ConversationsState>((set) => ({
       ) as Conversation[],
     });
   },
+  fetch: async (conversationId) => {
+    const result = await fetch(
+      `${Environment.apiBaseUrl}/api/user/${localStorage.getItem('userId')}/conversation/${conversationId}`,
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+        },
+      },
+    )
+      .then((response) => (response.ok ? response.json() : Promise.reject(response)))
+      .then((data) => data.data as ConversationDto)
+      .catch((err) => {
+        console.error(err);
+        throw err;
+      });
+
+    return set({
+      conversation: {
+        id: result.id ?? 0,
+        name: result.name ?? '',
+        members:
+          result.members?.map(
+            (m) =>
+              ({
+                id: m.data.id,
+                name: m.data.name,
+                last_seen_at: m.data.last_seen_at,
+              }) as User,
+          ) ?? [],
+      },
+    });
+  },
 
   startConversation: async (user) => {
     const result = await fetch(`${Environment.apiBaseUrl}/api/user/1/conversation`, {
       method: 'POST',
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+      },
       body: JSON.stringify({
         user_ids: [user.id],
       }),
     })
       .then((response) => response.json())
-      .then((data: ConversationDto) => data)
+      .then((data) => data.data as ConversationDto)
       .catch((err) => {
         console.error(err);
         throw err;
@@ -61,10 +101,10 @@ const useConversationStore = create<ConversationsState>((set) => ({
 
     set({
       conversation: {
-        id: result.data.id ?? 0,
-        name: result.data.name ?? user.name,
+        id: result.id ?? 0,
+        name: result.name ?? user.name,
         members:
-          result.data.members?.map(
+          result.members?.map(
             (m) =>
               <User>{
                 id: m.data.id,
@@ -77,13 +117,16 @@ const useConversationStore = create<ConversationsState>((set) => ({
   startGroup: async (users, name) => {
     const result = await fetch(`${Environment.apiBaseUrl}/api/user/1/conversation`, {
       method: 'POST',
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
+      },
       body: JSON.stringify({
         user_ids: [users.map((u) => u.id)],
         name,
       }),
     })
       .then((response) => response.json())
-      .then((data: ConversationDto) => data)
+      .then((data) => data.data as ConversationDto)
       .catch((err) => {
         console.error(err);
         throw err;
@@ -91,10 +134,10 @@ const useConversationStore = create<ConversationsState>((set) => ({
 
     set({
       conversation: {
-        id: result.data.id ?? 0,
-        name: result.data.name ?? '',
+        id: result.id ?? 0,
+        name: result.name ?? '',
         members:
-          result.data.members?.map(
+          result.members?.map(
             (m) =>
               <User>{
                 id: m.data.id,

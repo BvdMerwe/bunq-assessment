@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Application\Actions\User;
 
+use Cake\Validation\Validator;
 use Psr\Http\Message\ResponseInterface as Response;
 
 class ViewUserAction extends UserAction
@@ -13,8 +14,15 @@ class ViewUserAction extends UserAction
      */
     protected function action(): Response
     {
-        $userId = (int) $this->resolveArg('id');
-        $user = $this->userRepository->findUserOfId($userId);
+        $validator = new Validator();
+        $validator->requirePresence('userId');
+        $errors = $validator->validate($this->request->getAttributes());
+        if (!empty($errors)) {
+            return $this->respondWithData($errors, 400);
+        }
+
+        $userId = (int) $this->resolveArg('userId');
+        $user = $this->repository->getUserById($userId);
 
         $this->logger->info("User of id `{$userId}` was viewed.");
 

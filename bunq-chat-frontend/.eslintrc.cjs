@@ -23,5 +23,7 @@ module.exports = {
     }],
     'no-console': 'off',
     'no-unused-vars': 'off',
+    'react/require-default-props': 'off',
+    'react/jsx-props-no-spreading': 'off',
   },
 }

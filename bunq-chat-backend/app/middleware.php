@@ -7,6 +7,5 @@ use Slim\App;
 use Tuupola\Middleware\JwtAuthentication;
 
 return function (App $app) {
-    $app->add(SessionMiddleware::class)
-        ->add(JwtAuthentication::class);
+    $app->add(SessionMiddleware::class);
 };

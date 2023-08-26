@@ -27,5 +27,11 @@ return function (ContainerBuilder $containerBuilder) {
 
             return $logger;
         },
+        JwtAuthentication::class => static function (ContainerInterface $c): JwtAuthentication {
+            $settings = $c->get(SettingsInterface::class);
+            return new  JwtAuthentication(
+                $settings->get('jwt_authentication')
+            );
+        },
     ]);
 };

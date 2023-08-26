@@ -13,7 +13,7 @@ export default function LoginPage() {
       setError('Please fill in all fields');
       return;
     }
-    await login(username, password);
+    login(username, password).catch((err) => setError(err.data));
   }
 
   useEffect(() => {

@@ -1,4 +1,6 @@
 export interface LoginDto {
-  accessToken: string;
-  refreshToken: string;
+  data: {
+    accessToken: string;
+    refreshToken: string;
+  };
 }
