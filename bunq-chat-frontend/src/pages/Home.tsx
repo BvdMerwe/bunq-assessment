@@ -54,7 +54,10 @@ export default function HomePage() {
             </h1>
             {conversation.members.length === 1 ? (
               <p className="text-black/50 text-sm">
-                Last seen {formatDistanceToNow(new Date(conversation.members[0]?.last_seen_at!), { addSuffix: true })}
+                Last seen{' '}
+                {conversation.members[0]?.last_seen_at
+                  ? formatDistanceToNow(new Date(conversation.members[0]?.last_seen_at!), { addSuffix: true })
+                  : 'never'}
               </p>
             ) : (
               <ul className="text-black/50 text-sm flex flex-wrap gap-2 w-full block">

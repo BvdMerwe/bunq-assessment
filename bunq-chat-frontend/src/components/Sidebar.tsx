@@ -34,46 +34,48 @@ export default function Sidebar() {
   }
 
   return (
-    <div className="max-w-[250px] border-r grid gap-2 grid-rows-2">
-      <div className="flex flex-col gap-2">
-        {conversationStore.conversations.map((conversation) => (
+    <div className="max-w-[250px] max-h-screen border-r grid gap-2 grid-rows-[1fr_40px]">
+      <div className="max-h-full w-full overflow-scroll">
+        <div className="flex flex-col gap-2">
+          {conversationStore.conversations.map((conversation) => (
+            <button
+              type="button"
+              key={conversation.id}
+              onClick={() => selectConversation(conversation.id)}
+              className="p-2 px-5 border-b cursor-pointer text-start flex"
+            >
+              <div>{conversation.members.length < 2 ? <FiUser className="me-2" /> : <FiUsers className="me-2" />}</div>
+              <div>
+                <span>{conversation.name ? conversation.name : conversation.members[0].name}</span>
+                {conversation.members.length > 2 && (
+                  <span className="text-xs ms-2 text-black/50">{conversation.members.length}</span>
+                )}
+                <p className="text-xs text-black/50">{conversation.last_message?.message}</p>
+              </div>
+            </button>
+          ))}
+
           <button
             type="button"
-            key={conversation.id}
-            onClick={() => selectConversation(conversation.id)}
-            className="p-2 px-5 border-b cursor-pointer text-start flex"
+            onClick={() => {
+              setOpenModal(true);
+            }}
+            className="p-2 px-5 border-b cursor-pointer text-start flex justify-start items-center"
           >
-            <div>{conversation.members.length < 2 ? <FiUser className="me-2" /> : <FiUsers className="me-2" />}</div>
-            <div>
-              <span>{conversation.name ? conversation.name : conversation.members[0].name}</span>
-              {conversation.members.length > 2 && (
-                <span className="text-xs ms-2 text-black/50">{conversation.members.length}</span>
-              )}
-              <p className="text-xs text-black/50">{conversation.last_message?.message}</p>
-            </div>
+            <FiPlus className="me-2" />
+            <span>New Conversation</span>
           </button>
-        ))}
-
-        <button
-          type="button"
-          onClick={() => {
-            setOpenModal(true);
-          }}
-          className="p-2 px-5 border-b cursor-pointer text-start flex justify-start items-center"
-        >
-          <FiPlus className="me-2" />
-          <span>New Conversation</span>
-        </button>
-        <button
-          type="button"
-          onClick={() => {
-            setOpenGroupModal(true);
-          }}
-          className="p-2 px-5 border-b cursor-pointer text-start flex justify-start items-center"
-        >
-          <FiUserPlus className="me-2" />
-          <span>New GroupChat</span>
-        </button>
+          <button
+            type="button"
+            onClick={() => {
+              setOpenGroupModal(true);
+            }}
+            className="p-2 px-5 border-b cursor-pointer text-start flex justify-start items-center"
+          >
+            <FiUserPlus className="me-2" />
+            <span>New GroupChat</span>
+          </button>
+        </div>
       </div>
       <div className="flex flex-col gap-2 self-end ">
         <Link to="/logout" className="p-2 px-5 border-t">

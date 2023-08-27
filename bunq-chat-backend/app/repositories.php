@@ -23,6 +23,7 @@ return function (ContainerBuilder $containerBuilder) {
 //        UserRepository::class => \DI\autowire(RemoteUserRepository::class),
 //        ConversationRepository::class => \DI\autowire(RemoteConversationRepository::class),
 //        MessageRepository::class => \DI\autowire(RemoteMessageRepository::class),
+
 //TODO: Uncomment for Database repositories
         UserRepository::class => \DI\autowire(DatabaseUserRepository::class),
         ConversationRepository::class => \DI\autowire(DatabaseConversationRepository::class),
