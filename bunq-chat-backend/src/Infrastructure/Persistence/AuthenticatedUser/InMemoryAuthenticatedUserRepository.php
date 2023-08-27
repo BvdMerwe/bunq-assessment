@@ -49,7 +49,7 @@ class InMemoryAuthenticatedUserRepository implements AuthenticatedUserRepository
     /**
      * {@inheritdoc}
      */
-    public function findUserOfId(int $id): AuthenticatedUser
+    public function getUserById(int $id): AuthenticatedUser
     {
         if (!isset($this->users[$id])) {
             throw new UserNotFoundException();

@@ -16,7 +16,7 @@ interface AuthenticatedUserRepository
      * @return AuthenticatedUser
      * @throws UserNotFoundException
      */
-    public function findUserOfId(int $id): AuthenticatedUser;
+    public function getUserById(int $id): AuthenticatedUser;
 
     /**
      * @param string $username

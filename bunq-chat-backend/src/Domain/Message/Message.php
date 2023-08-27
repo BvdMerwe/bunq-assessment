@@ -39,4 +39,19 @@ class Message implements \JsonSerializable
             new \DateTime($data['sent_at'])
         );
     }
+
+    public function getId(): int
+    {
+        return $this->id;
+    }
+
+    public function getText(): string
+    {
+        return $this->message;
+    }
+
+    public function getSentAt(): \DateTime
+    {
+        return $this->sentAt;
+    }
 }

@@ -21,8 +21,8 @@ class DatabaseUserRepository implements UserRepository
     public function listUsers(): array
     {
         $query = UserModel::all();
-        return $query->map(function (UserModel $user) {
-            return $user->toDomain();
+        return $query->map(function (UserModel $model) {
+            return $model->toDomain();
         })->toArray();
     }
 

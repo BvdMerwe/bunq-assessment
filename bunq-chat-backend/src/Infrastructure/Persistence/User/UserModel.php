@@ -9,7 +9,9 @@ class UserModel extends Model
 {
     protected $table = 'user';
     protected $primaryKey = 'id';
-    protected $fillable = ['name', 'last_seen', 'password'];
+    protected $fillable = ['name', 'last_seen'];
+    protected $hidden = ['password', 'pivot'];
+    public $timestamps = false;
 
     public function fromDomain(User $user): UserModel
     {

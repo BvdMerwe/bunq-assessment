@@ -2,6 +2,7 @@
 
 namespace App\Infrastructure\Remote\Conversation;
 
+use App\Domain\Conversation\Conversation;
 use App\Domain\Conversation\ConversationRepository;
 use App\Infrastructure\ApiClient\GuzzleApiClient;
 use Exception;
@@ -26,7 +27,7 @@ class RemoteConversationRepository implements ConversationRepository
             [
                 "id" => 1,
                 "name" => "",
-                "last_message" => "2021-07-21T08:06:54.000000Z",
+                "last_message" => null,
                 "members" => [
                     [
                         "id" => 7,
@@ -38,7 +39,7 @@ class RemoteConversationRepository implements ConversationRepository
             [
                 "id" => 2,
                 "name" => "",
-                "last_message" => "2021-07-21T08:06:54.000000Z",
+                "last_message" => null,
                 "members" => [
 
                     [
@@ -51,7 +52,7 @@ class RemoteConversationRepository implements ConversationRepository
             [
                 "id" => 3,
                 "name" => "The nerds",
-                "last_message" => "2021-07-21T08:06:54.000000Z",
+                "last_message" => null,
                 "members" => [
                     [
                         "id" => 9,
@@ -76,25 +77,25 @@ class RemoteConversationRepository implements ConversationRepository
     /**
      * @throws Exception
      */
-    public function getConversationById(int $userId, int $conversationId): array
+    public function getConversationById(int $userId, int $conversationId): Conversation
     {
         if (!$_ENV["MOCK_DATA"]) {
-            return $this->client->get("/api/user/$userId/conversation/$conversationId");
+            return Conversation::fromJson($this->client->get("/api/user/$userId/conversation/$conversationId"));
         }
         $conversations = $this->listConversations($userId);
         $key = array_search($conversationId, array_column($conversations, 'id'));
-        return $conversations[$key];
+        return Conversation::fromJson($conversations[$key]);
     }
 
-    public function createConversation(int $userId, array $userIds, string $name): array
+    public function createConversation(int $userId, array $userIds, string $name): Conversation
     {
         if (!$_ENV["MOCK_DATA"]) {
-            return $this->client->post("/api/user/$userId/conversation", [
+            return Conversation::fromJson($this->client->post("/api/user/$userId/conversation", [
                 "user_ids" => $userIds,
                 "name" => $name,
-            ]);
+            ]));
         }
-        return [
+        return Conversation::fromJson([
             [
                 "id" => count($userIds),
                 "name" => $name,
@@ -117,6 +118,6 @@ class RemoteConversationRepository implements ConversationRepository
                     ]
                 ],
             ],
-        ];
+        ]);
     }
 }

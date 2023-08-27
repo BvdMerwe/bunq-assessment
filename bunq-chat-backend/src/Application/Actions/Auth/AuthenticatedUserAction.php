@@ -9,7 +9,7 @@ class AuthenticatedUserAction extends AuthAction
     protected function action(): Response
     {
         $userId = $this->authService->getAuthenticatedId($this->request);
-        $user = $this->userRepository->findUserOfId($userId);
+        $user = $this->userRepository->getUserById($userId);
         return $this->respondWithData($user);
     }
 }

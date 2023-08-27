@@ -2,16 +2,18 @@
 
 namespace App\Infrastructure\Persistence\Conversation;
 
+use App\Domain\Conversation\Conversation;
 use App\Domain\Conversation\ConversationRepository;
-use App\Infrastructure\ApiClient\GuzzleApiClient;
+use App\Infrastructure\Persistence\User\UserModel;
 use Exception;
+use Illuminate\Database\Capsule\Manager;
 
 class DatabaseConversationRepository implements ConversationRepository
 {
-    private GuzzleApiClient $client;
-    public function __construct()
+    private Manager $manager;
+    public function __construct(Manager $manager)
     {
-        $this->client = new GuzzleApiClient();
+        $this->manager = $manager;
     }
 
     /**
@@ -19,104 +21,49 @@ class DatabaseConversationRepository implements ConversationRepository
      */
     public function listConversations($userId): array
     {
-        if (!$_ENV["MOCK_DATA"]) {
-            return $this->client->get("/api/user/$userId/conversation");
-        }
-        return [
-            [
-                "id" => 1,
-                "name" => "",
-                "last_message" => "2021-07-21T08:06:54.000000Z",
-                "members" => [
-                    [
-                        "id" => 7,
-                        "name" => "mdemaa",
-                        "last_seen_at" => "2021-07-03T06:06:11.000000Z"
-                    ]
-                ],
-            ],
-            [
-                "id" => 2,
-                "name" => "",
-                "last_message" => "2021-07-21T08:06:54.000000Z",
-                "members" => [
-
-                    [
-                        "id" => 9,
-                        "name" => "wessel",
-                        "last_seen_at" => "2021-07-21T08:07:37.000000Z"
-                    ],
-                ],
-            ],
-            [
-                "id" => 3,
-                "name" => "The nerds",
-                "last_message" => "2021-07-21T08:06:54.000000Z",
-                "members" => [
-                    [
-                        "id" => 9,
-                        "name" => "wessel",
-                        "last_seen_at" => "2021-07-21T08:07:37.000000Z"
-                    ],
-                    [
-                        "id" => 8,
-                        "name" => "nick",
-                        "last_seen_at" => "2021-06-17T16:06:11.000000Z"
-                    ],
-                    [
-                        "id" => 7,
-                        "name" => "mdemaa",
-                        "last_seen_at" => "2021-07-03T06:06:11.000000Z"
-                    ]
-                ],
-            ],
-        ];
+        $query = ConversationModel::query()
+            ->whereHas('members', function ($query) use ($userId) {
+                $query->where('user.id', $userId);
+            })->get();
+        return $query->map(function (ConversationModel $model) {
+            return $model->toDomain();
+        })->toArray();
     }
 
     /**
      * @throws Exception
      */
-    public function getConversationById(int $userId, int $conversationId): array
+    public function getConversationById(int $userId, int $conversationId): Conversation
     {
-        if (!$_ENV["MOCK_DATA"]) {
-            return $this->client->get("/api/user/$userId/conversation/$conversationId");
-        }
-        $conversations = $this->listConversations($userId);
-        $key = array_search($conversationId, array_column($conversations, 'id'));
-        return $conversations[$key];
+        $query = ConversationModel::query()
+            ->where('id', $conversationId)
+            ->whereHas('members', function ($query) use ($userId) {
+                $query->where('user.id', $userId);
+            })
+            ->firstOrFail();
+        return $query->toDomain();
     }
 
-    public function createConversation(int $userId, array $userIds, string $name): array
+    public function createConversation(int $userId, array $userIds, string $name): Conversation
     {
-        if (!$_ENV["MOCK_DATA"]) {
-            return $this->client->post("/api/user/$userId/conversation", [
-                "user_ids" => $userIds,
-                "name" => $name,
-            ]);
+        $allUsers = array_merge($userIds, [$userId]);
+        // dont create duplicate conversations
+        $existingConversation = ConversationModel::query()
+            ->has('members', '=', count($allUsers))
+            ->whereHas('members', function ($query) use ($allUsers) {
+                $query->whereIn('user_id', $allUsers);
+            })
+            ->get();
+        if ($existingConversation->count() > 0) {
+            return $existingConversation->first()->toDomain();
         }
-        return [
-            [
-                "id" => count($userIds),
-                "name" => $name,
-                "last_message" => null,
-                "members" => [
-                    [
-                        "id" => 9,
-                        "name" => "wessel",
-                        "last_seen_at" => "2021-07-21T08:07:37.000000Z"
-                    ],
-                    [
-                        "id" => 8,
-                        "name" => "nick",
-                        "last_seen_at" => "2021-06-17T16:06:11.000000Z"
-                    ],
-                    [
-                        "id" => 7,
-                        "name" => "mdemaa",
-                        "last_seen_at" => "2021-07-03T06:06:11.000000Z"
-                    ]
-                ],
-            ],
-        ];
+
+        $users = UserModel::query()->whereIn('id', $allUsers)->get();
+        $conversation = new ConversationModel([
+            'name' => $name,
+        ]);
+        $conversation->save();
+        $conversation->members()->saveMany($users);
+        return $conversation->toDomain();
     }
 }

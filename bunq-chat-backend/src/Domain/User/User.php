@@ -38,7 +38,7 @@ class User implements \JsonSerializable
             $data['id'],
             $data['name'],
             new DateTime($data['last_seen_at']),
-            $data['password'],
+            $data['password'] ?? '',
         );
     }
 

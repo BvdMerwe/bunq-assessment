@@ -2,6 +2,7 @@
 
 namespace App\Infrastructure\Remote\Message;
 
+use App\Domain\Message\Message;
 use App\Domain\Message\MessageRepository;
 use App\Infrastructure\ApiClient\GuzzleApiClient;
 
@@ -111,19 +112,19 @@ class RemoteMessageRepository implements MessageRepository
         ];
     }
 
-    public function createMessage(int $userId, int $conversationId, string $message): array
+    public function createMessage(int $userId, int $conversationId, string $message): Message
     {
         if (!$_ENV["MOCK_DATA"]) {
-            return $this->client->post("/api/user/$userId/conversation/$conversationId/message", [
+            return Message::fromJson($this->client->post("/api/user/$userId/conversation/$conversationId/message", [
                 'text' => $message,
-            ]);
+            ]));
         }
-        return [
+        return Message::fromJson([
             "id" => 2,
             "user_id" => $userId,
             "text" => $message,
             "sent_at" => "2021-07-21T08:08:15.000000Z",
-        ];
+        ]);
     }
 }
 

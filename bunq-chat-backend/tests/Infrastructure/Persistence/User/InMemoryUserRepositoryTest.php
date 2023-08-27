@@ -35,19 +35,19 @@ class InMemoryUserRepositoryTest extends TestCase
         $this->assertEquals(array_values($users), $userRepository->findAll());
     }
 
-    public function testFindUserOfId()
+    public function testgetUserById()
     {
         $user = new AuthenticatedUser(1, 'bill.gates', 'Bill', 'Gates');
 
         $userRepository = new InMemoryAuthenticatedUserRepository([1 => $user]);
 
-        $this->assertEquals($user, $userRepository->findUserOfId(1));
+        $this->assertEquals($user, $userRepository->getUserById(1));
     }
 
-    public function testFindUserOfIdThrowsNotFoundException()
+    public function testgetUserByIdThrowsNotFoundException()
     {
         $userRepository = new InMemoryAuthenticatedUserRepository([]);
         $this->expectException(UserNotFoundException::class);
-        $userRepository->findUserOfId(1);
+        $userRepository->getUserById(1);
     }
 }

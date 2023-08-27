@@ -27,7 +27,7 @@ class CreateMessageAction extends MessageAction
         $messageText = (string) $this->request->getParsedBody()['message'];
         $message = $this->repository->createMessage($userId, $conversationId, $messageText);
 
-        $this->logger->info("Message `{$message['id']}` of id `{$conversationId}` was viewed.");
+//        $this->logger->info("Message `{$message['id']}` of conversation `{$conversationId}` was creatad.");
 
         return $this->respondWithData($message);
     }

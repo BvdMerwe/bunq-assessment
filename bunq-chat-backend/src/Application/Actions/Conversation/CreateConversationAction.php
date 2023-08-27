@@ -18,7 +18,6 @@ class CreateConversationAction extends ConversationAction
         $validator
             ->requirePresence('userIds');
         $formData = $this->getFormData();
-        $this->logger->debug(print_r($formData, true));
         $errors = $validator->validate($formData ?? []);
         if (!empty($errors)) {
             return $this->respondWithData($errors, 400);

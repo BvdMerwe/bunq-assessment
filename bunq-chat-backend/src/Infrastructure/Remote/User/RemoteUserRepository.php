@@ -84,4 +84,11 @@ class RemoteUserRepository implements UserRepository
         $key = array_search($userId, array_column($users, 'id'));
         return User::fromJson($users[$key]);
     }
+
+    public function findUserByUsername(string $username): User
+    {
+        $users = $this->listUsers();
+        $key = array_search($username, array_column($users, 'name'));
+        return User::fromJson($users[$key]);
+    }
 }
