@@ -34,6 +34,7 @@ return function (App $app) {
             $group->post('/refresh', RefreshAction::class);
         });
 
+        //Consider getting the user id from the token instead
         $group->group('/user', function (Group $group) {
             $group->get('', ListUsersAction::class);
             $group->get('/{userId}', ViewUserAction::class);

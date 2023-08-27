@@ -37,6 +37,12 @@ return function (ContainerBuilder $containerBuilder) {
                             ));
                     }
                 ],
+                'db' => [
+                    'driver' => 'sqlite',
+                    'host' => 'localhost',
+                    'database' => __DIR__ . '/../database/database.sqlite',
+                    'prefix'    => '',
+                ]
             ]);
         }
     ]);

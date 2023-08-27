@@ -1,8 +1,8 @@
-import { UserDto } from './user.dto.ts';
+import { User } from '../store/user.store.ts';
 
 export interface ConversationDto {
   id?: number;
   name?: string;
-  members?: UserDto[];
+  members?: User[];
   last_message?: string;
 }

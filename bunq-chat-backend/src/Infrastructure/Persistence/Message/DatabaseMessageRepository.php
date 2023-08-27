@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Infrastructure\Remote\Message;
+namespace App\Infrastructure\Persistence\Message;
 
 use App\Domain\Message\MessageRepository;
 use App\Infrastructure\ApiClient\GuzzleApiClient;
 
-class RemoteMessageRepository implements MessageRepository
+class DatabaseMessageRepository implements MessageRepository
 {
     private GuzzleApiClient $client;
     public function __construct()

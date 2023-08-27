@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Application\Settings\SettingsInterface;
 use DI\ContainerBuilder;
+use Illuminate\Database\Capsule\Manager;
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
 use Monolog\Processor\UidProcessor;
@@ -33,5 +34,15 @@ return function (ContainerBuilder $containerBuilder) {
                 $settings->get('jwt_authentication')
             );
         },
+        Manager::class => static function (ContainerInterface $c): Manager {
+            $capsule = new Manager();
+            $settings = $c->get(SettingsInterface::class);
+            $capsule->addConnection($settings->get('db'));
+
+            $capsule->setAsGlobal();
+            $capsule->bootEloquent();
+
+            return $capsule;
+        }
     ]);
 };

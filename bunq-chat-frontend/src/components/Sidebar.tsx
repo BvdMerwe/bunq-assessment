@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { FiLogOut, FiPlus, FiUser } from 'react-icons/fi';
+import { FiLogOut, FiPlus, FiUser, FiUsers } from 'react-icons/fi';
 import { useEffect, useState } from 'react';
 import useConversationStore from '../store/conversation.store.ts';
 import UserModal from './UserModal.tsx';
@@ -14,12 +14,14 @@ export default function Sidebar() {
   }, []);
 
   async function selectConversation(conversationId: number) {
-    await conversationStore.fetch(conversationId);
-    await conversationStore.fetchAll();
+    conversationStore.fetch(conversationId);
+    conversationStore.fetchAll();
   }
 
   function startNewConversation(user: User) {
-    conversationStore.startConversation!(user);
+    conversationStore.startConversation!(user).then(() => {
+      setOpenModal(false);
+    });
   }
 
   return (
@@ -32,9 +34,11 @@ export default function Sidebar() {
             onClick={() => selectConversation(conversation.id)}
             className="p-2 px-5 border-b cursor-pointer text-start"
           >
-            <FiUser className="me-2" />
-            <span>{conversation.name}</span>
-            <span className="text-xs ms-2 text-black/50">{conversation.members.length}</span>
+            {conversation.members.length === 1 ? <FiUser className="me-2" /> : <FiUsers className="me-2" />}
+            <span>{conversation.name ? conversation.name : conversation.members[0].name}</span>
+            {conversation.members.length > 1 && (
+              <span className="text-xs ms-2 text-black/50">{conversation.members.length}</span>
+            )}
           </button>
         ))}
 
@@ -59,7 +63,6 @@ export default function Sidebar() {
         isOpen={openModal}
         closeModal={() => setOpenModal(false)}
         selectUser={(user) => {
-          console.log(user);
           startNewConversation(user);
         }}
       />

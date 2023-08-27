@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Infrastructure\Remote\Conversation;
+namespace App\Infrastructure\Persistence\Conversation;
 
 use App\Domain\Conversation\ConversationRepository;
 use App\Infrastructure\ApiClient\GuzzleApiClient;
 use Exception;
 
-class RemoteConversationRepository implements ConversationRepository
+class DatabaseConversationRepository implements ConversationRepository
 {
     private GuzzleApiClient $client;
     public function __construct()

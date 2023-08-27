@@ -5,7 +5,7 @@ import { UserDto } from '../types/user.dto.ts';
 export interface User {
   id: number;
   name: string;
-  last_seen_at?: string;
+  last_seen_at?: Date;
 }
 
 const useUserStore = create<User>((set) => ({
@@ -16,9 +16,9 @@ const useUserStore = create<User>((set) => ({
       authenticated: true,
       path: `/api/user/${localStorage.getItem('userId')}`,
     });
-    const result = (await execute()) as UserDto;
+    const result = (await execute()).data as UserDto;
 
-    return set({ id, name: result.data.name });
+    return set({ id, name: result.name, last_seen_at: new Date(result.last_seen_at!) });
   },
 }));
 

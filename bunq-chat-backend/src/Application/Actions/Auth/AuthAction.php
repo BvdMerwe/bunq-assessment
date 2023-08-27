@@ -7,14 +7,15 @@ namespace App\Application\Actions\Auth;
 use App\Application\Actions\Action;
 use App\Domain\Auth\Auth;
 use App\Domain\AuthenticatedUser\AuthenticatedUserRepository;
+use App\Domain\User\UserRepository;
 use Psr\Log\LoggerInterface;
 
 abstract class AuthAction extends Action
 {
-    protected AuthenticatedUserRepository $userRepository;
+    protected UserRepository $userRepository;
     protected Auth $authService;
 
-    public function __construct(LoggerInterface $logger, AuthenticatedUserRepository $userRepository, Auth $authService,)
+    public function __construct(LoggerInterface $logger, UserRepository $userRepository, Auth $authService,)
     {
         parent::__construct($logger);
         $this->userRepository = $userRepository;

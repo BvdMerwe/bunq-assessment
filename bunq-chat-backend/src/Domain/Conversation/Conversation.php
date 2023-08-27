@@ -2,6 +2,8 @@
 
 namespace App\Domain\Conversation;
 
+use App\Infrastructure\Persistence\Conversation\ConversationModel;
+
 class Conversation implements \JsonSerializable
 {
     public function __construct(

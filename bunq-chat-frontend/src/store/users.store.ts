@@ -14,7 +14,7 @@ const useUsersStore = create<Users>((set) => ({
       authenticated: true,
       path: `/api/user`,
     });
-    const result = (await execute()) as User[];
+    const result = (await execute()).data as User[];
 
     return set({
       users: result.map(
