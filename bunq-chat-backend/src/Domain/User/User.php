@@ -9,7 +9,7 @@ class User implements \JsonSerializable
     public function __construct(
         ?int $id,
         string $name,
-        DateTime $lastSeen,
+        ?DateTime $lastSeen,
         string $password
     ) {
         $this->id = $id;
@@ -20,7 +20,7 @@ class User implements \JsonSerializable
 
     private ?int $id;
     private string $name;
-    private DateTime $lastSeen;
+    private ?DateTime $lastSeen;
     private string $password;
 
     public function jsonSerialize(): array
@@ -28,7 +28,7 @@ class User implements \JsonSerializable
         return [
             'id' => $this->id,
             'name' => $this->name,
-            'last_seen_at' => $this->lastSeen->format('Y-m-d\TH:i:s.u\Z'),
+            'last_seen_at' => $this->lastSeen ? $this->lastSeen->format('Y-m-d\TH:i:s.u\Z') : null,
         ];
     }
 

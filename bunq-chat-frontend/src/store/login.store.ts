@@ -8,7 +8,7 @@ export interface Login {
   isLoggedIn: boolean;
   accessToken: string;
   refreshToken: string;
-  currentUser?: User;
+  currentUser: User;
   login: (username: string, password: string) => Promise<void>;
   fetchMe: () => Promise<void>;
   logout: () => void;
@@ -19,6 +19,7 @@ const useLoginStore = create<Login>((set) => ({
   isLoggedIn: false,
   accessToken: '',
   refreshToken: '',
+  currentUser: <User>{},
   login: async (username: string, password: string) => {
     const { execute } = ApiClient({
       method: 'POST',
@@ -51,7 +52,6 @@ const useLoginStore = create<Login>((set) => ({
     set({ isLoggedIn: true, accessToken: loginResult.accessToken, refreshToken: loginResult.refreshToken });
   },
   fetchMe: async () => {
-    // TODO: Implement login
     const currentUser = await fetch(`${Environment.authApiBaseUrl}/api/auth/me`, {
       headers: {
         'Content-Type': 'application/json',

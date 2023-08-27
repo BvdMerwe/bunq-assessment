@@ -8,9 +8,13 @@ export interface User {
   last_seen_at?: Date;
 }
 
-const useUserStore = create<User>((set) => ({
-  id: 0,
-  name: '',
+export interface UserStore {
+  user: User | null;
+  fetch: (id: number) => Promise<void>;
+}
+
+const useUserStore = create<UserStore>((set) => ({
+  user: null,
   fetch: async (id: number) => {
     const { execute } = ApiClient({
       authenticated: true,
@@ -18,7 +22,7 @@ const useUserStore = create<User>((set) => ({
     });
     const result = (await execute()).data as UserDto;
 
-    return set({ id, name: result.name, last_seen_at: new Date(result.last_seen_at!) });
+    return set({ user: { id, name: result.name ?? '', last_seen_at: new Date(result.last_seen_at!) } });
   },
 }));
 

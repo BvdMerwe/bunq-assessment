@@ -2,12 +2,14 @@ import { create } from 'zustand';
 import { User } from './user.store.ts';
 import { ConversationDto } from '../types/conversation.dto.ts';
 import ApiClient from '../utils/ApiClient.ts';
+import { Message } from './message.store.ts';
+import conversationBuilder from '../utils/conversationBuilder.ts';
 
 export interface Conversation {
   id: number;
   name: string;
   members: User[];
-  last_message: Date;
+  last_message: Message | null;
 }
 export interface ConversationsState {
   conversation: Conversation | null;
@@ -29,15 +31,7 @@ const useConversationStore = create<ConversationsState>((set) => ({
     const result = (await execute()).data as ConversationDto[];
 
     return set({
-      conversations: result.map(
-        (conversation: ConversationDto) =>
-          <Conversation>{
-            id: conversation.id,
-            name: conversation.name,
-            members: conversation.members?.map((m: User) => m) ?? [],
-            last_message: new Date(conversation.last_message ?? ''),
-          },
-      ) as Conversation[],
+      conversations: result.map((conversation: ConversationDto) => conversationBuilder(conversation)) as Conversation[],
     });
   },
   fetch: async (conversationId) => {
@@ -48,12 +42,7 @@ const useConversationStore = create<ConversationsState>((set) => ({
     const result = (await execute()).data as ConversationDto;
 
     return set({
-      conversation: {
-        id: result.id ?? 0,
-        name: result.name ?? '',
-        members: result.members?.map((m: User) => m) ?? [],
-        last_message: new Date(result.last_message ?? ''),
-      },
+      conversation: conversationBuilder(result),
     });
   },
 
@@ -66,15 +55,10 @@ const useConversationStore = create<ConversationsState>((set) => ({
         userIds: [user.id],
       },
     });
-    const result = await execute();
+    const result = (await execute()).data as ConversationDto;
 
     set({
-      conversation: {
-        id: result.id ?? 0,
-        name: result.name ?? user.name,
-        members: result.members?.map((m: User) => m) ?? [],
-        last_message: new Date(result.last_message ?? ''),
-      },
+      conversation: conversationBuilder(result),
     });
   },
   startGroup: async (users, name) => {
@@ -83,19 +67,14 @@ const useConversationStore = create<ConversationsState>((set) => ({
       authenticated: true,
       path: `/api/user/${localStorage.getItem('userId')}/conversation`,
       body: {
-        userIds: [users.map((u) => u.id)],
+        userIds: users.map((u) => u.id),
         name,
       },
     });
-    const result = await execute();
+    const result = (await execute()).data as ConversationDto;
 
     set({
-      conversation: {
-        id: result.id ?? 0,
-        name: result.name ?? '',
-        members: result.members?.map((m: User) => m) ?? [],
-        last_message: new Date(result.last_message ?? ''),
-      },
+      conversation: conversationBuilder(result),
     });
   },
 }));

@@ -16,6 +16,9 @@ input {
     &.btn-rounded {
         @apply rounded-full;
     }
+    &[disabled] {
+        @apply bg-gray-300;
+    }
 }
 
 svg, img {

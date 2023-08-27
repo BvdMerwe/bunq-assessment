@@ -29,6 +29,12 @@ export default function MessageBox() {
         className="w-full h-full m-0 p-3 rounded-[10px] outline-0 border"
         value={message}
         onInput={(e) => setMessage(e.currentTarget.value)}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            sendMessage();
+          }
+        }}
       />
       <button type="button" className="btn btn-rounded min-w-[50px] min-h-[50px]" onClick={sendMessage}>
         <FiSend />

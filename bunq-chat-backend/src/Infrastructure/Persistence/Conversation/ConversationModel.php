@@ -43,7 +43,9 @@ class ConversationModel extends Model
         return new Conversation(
             $this->id,
             $this->name,
-            $this->members->toArray(),
+            $this->members->map(function (UserModel $model) {
+                return $model->toDomain();
+            })->toArray(),
             isset($this->lastMessage) ? $this->lastMessage->toDomain() : null,
         );
     }

@@ -18,12 +18,16 @@ class DatabaseMessageRepository implements MessageRepository
     }
     public function listMessages(int $userId, int $conversationId): array
     {
-        $user = UserModel::query()->find($userId);
-        $conversation = ConversationModel::query()->find($conversationId);
+//        $user = UserModel::query()->find($userId);
+        $conversation = ConversationModel::query()
+            ->whereHas('members', function ($query) use ($userId) {
+                $query->where('user.id', $userId);
+            })
+            ->find($conversationId);
         $messages = MessageModel::query()
             ->where('conversation_id', $conversationId)
-            ->whereBelongsTo($user, 'user')
             ->whereBelongsTo($conversation, 'conversation')
+            ->orderBy('sent_at', 'desc')
             ->get();
         return $messages->map(function (MessageModel $model) {
             return $model->toDomain();
@@ -36,7 +40,7 @@ class DatabaseMessageRepository implements MessageRepository
         $messageModel->user()->associate($userId);
         $messageModel->conversation()->associate($conversationId);
         $messageModel->text = $message;
-        $messageModel->sent_at = date('Y-m-d H:i:s');
+//        $messageModel->sent_at = new \DateTime('now');
         $messageModel->save();
         return $messageModel->toDomain();
     }

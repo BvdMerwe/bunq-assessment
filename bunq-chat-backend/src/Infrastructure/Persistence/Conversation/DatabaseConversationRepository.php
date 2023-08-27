@@ -47,13 +47,15 @@ class DatabaseConversationRepository implements ConversationRepository
     public function createConversation(int $userId, array $userIds, string $name): Conversation
     {
         $allUsers = array_merge($userIds, [$userId]);
-        // dont create duplicate conversations
         $existingConversation = ConversationModel::query()
-            ->has('members', '=', count($allUsers))
-            ->whereHas('members', function ($query) use ($allUsers) {
-                $query->whereIn('user_id', $allUsers);
-            })
-            ->get();
+            ->where(function ($query) use ($allUsers) {
+                foreach ($allUsers as $userId) {
+                    $query->whereHas('members', function ($subQuery) use ($userId) {
+                        return $subQuery->where('user.id', $userId);
+                    });
+                }
+            })->has('members', '=', count($allUsers));
+
         if ($existingConversation->count() > 0) {
             return $existingConversation->first()->toDomain();
         }

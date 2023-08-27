@@ -15,17 +15,20 @@ const useUsersStore = create<Users>((set) => ({
       path: `/api/user`,
     });
     const result = (await execute()).data as User[];
+    const currentUserId = localStorage.getItem('userId');
 
     return set({
-      users: result.map(
-        (user: User) =>
-          <User>{
-            id: user.id,
-            name: user.name,
-            last_seen_at: user.last_seen_at,
-          },
-      ),
-    } as Users);
+      users: result
+        .filter((m: User) => m.id.toString() !== currentUserId)
+        .map(
+          (user: User) =>
+            <User>{
+              id: user.id,
+              name: user.name,
+              last_seen_at: user.last_seen_at,
+            },
+        ),
+    });
   },
 }));
 

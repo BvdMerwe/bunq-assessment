@@ -1,5 +1,6 @@
 import { FormEvent, useEffect, useState } from 'react';
 import classNames from 'classnames';
+import { useNavigate } from 'react-router-dom';
 import useLoginStore from '../store/login.store.ts';
 
 export default function LoginPage() {
@@ -8,6 +9,7 @@ export default function LoginPage() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const { login, isLoggedIn, fetchMe } = useLoginStore((state) => state);
+  const navigate = useNavigate();
   async function triggerLogin(event: FormEvent) {
     event.preventDefault();
     setError('');
@@ -25,7 +27,7 @@ export default function LoginPage() {
   useEffect(() => {
     if (isLoggedIn) {
       fetchMe().then(() => {
-        window.location.href = '/app';
+        navigate('/app  ');
       });
     }
   }, [isLoggedIn]);
