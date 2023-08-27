@@ -1,8 +1,8 @@
 import { create } from 'zustand';
 import { User } from './user.store.ts';
-import { ConversationsDto } from '../types/conversations.dto.ts';
 import { ConversationDto } from '../types/conversation.dto.ts';
 import Environment from '../utils/environment.ts';
+import ApiClient from '../utils/ApiClient.ts';
 
 export interface Conversation {
   id: number;
@@ -22,21 +22,15 @@ const useConversationStore = create<ConversationsState>((set) => ({
   conversation: null,
   conversations: [],
   fetchAll: async () => {
-    const result = await fetch(`${Environment.apiBaseUrl}/api/user/1/conversation`, {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
-      },
-    })
-      .then((response) => (response.ok ? response.json() : Promise.reject(response)))
-      .then((data: ConversationsDto) => data)
-      .catch((err) => {
-        console.error(err);
-        throw err;
-      });
+    const { execute } = ApiClient({
+      authenticated: true,
+      path: `/api/user/${localStorage.getItem('userId')}/conversation`,
+    });
+    const result = await execute();
 
     return set({
       conversations: result.data.map(
-        (conversation) =>
+        (conversation: ConversationDto) =>
           <Conversation>{
             id: conversation.id,
             name: conversation.name,
@@ -50,20 +44,11 @@ const useConversationStore = create<ConversationsState>((set) => ({
     });
   },
   fetch: async (conversationId) => {
-    const result = await fetch(
-      `${Environment.apiBaseUrl}/api/user/${localStorage.getItem('userId')}/conversation/${conversationId}`,
-      {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
-        },
-      },
-    )
-      .then((response) => (response.ok ? response.json() : Promise.reject(response)))
-      .then((data) => data.data as ConversationDto)
-      .catch((err) => {
-        console.error(err);
-        throw err;
-      });
+    const { execute } = ApiClient({
+      authenticated: true,
+      path: `/api/user/${localStorage.getItem('userId')}/conversation/${conversationId}`,
+    });
+    const result = await execute();
 
     return set({
       conversation: {
@@ -71,11 +56,11 @@ const useConversationStore = create<ConversationsState>((set) => ({
         name: result.name ?? '',
         members:
           result.members?.map(
-            (m) =>
+            (m: User) =>
               ({
-                id: m.data.id,
-                name: m.data.name,
-                last_seen_at: m.data.last_seen_at,
+                id: m.id,
+                name: m.name,
+                last_seen_at: m.last_seen_at,
               }) as User,
           ) ?? [],
       },
@@ -83,22 +68,15 @@ const useConversationStore = create<ConversationsState>((set) => ({
   },
 
   startConversation: async (user) => {
-    const result = await fetch(`${Environment.apiBaseUrl}/api/user/1/conversation`, {
+    const { execute } = ApiClient({
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
-      },
-      body: JSON.stringify({
+      authenticated: true,
+      path: `/api/user/${localStorage.getItem('userId')}/conversation`,
+      body: {
         userIds: [user.id],
-      }),
-    })
-      .then((response) => response.json())
-      .then((data) => data.data as ConversationDto)
-      .catch((err) => {
-        console.error(err);
-        throw err;
-      });
+      },
+    });
+    const result = await execute();
 
     set({
       conversation: {
@@ -106,10 +84,10 @@ const useConversationStore = create<ConversationsState>((set) => ({
         name: result.name ?? user.name,
         members:
           result.members?.map(
-            (m) =>
+            (m: User) =>
               <User>{
-                id: m.data.id,
-                name: m.data.name,
+                id: m.id,
+                name: m.name,
               },
           ) ?? [],
       },

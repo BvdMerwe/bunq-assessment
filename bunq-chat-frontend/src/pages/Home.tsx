@@ -4,7 +4,6 @@ import MessageBox from '../components/MessageBox.tsx';
 import Message from '../components/Message.tsx';
 import useConversationStore from '../store/conversation.store.ts';
 import useMessageStore from '../store/message.store.ts';
-import conversationStore from '../store/conversation.store.ts';
 
 export default function HomePage() {
   const { conversation } = useConversationStore((state) => state);
@@ -29,7 +28,7 @@ export default function HomePage() {
         <div className="overflow-scroll max-h-[calc(100vh-180px)]">
           <div className="messages flex flex-col justify-end gap-2 p-2 border-b">
             {messages.map((message) => (
-              <Message name="Me" message={message.text} timestamp={message.sent_at} isMe />
+              <Message name="Me" message={message.text} timestamp={message.sent_at} isMe key={message.id} />
             ))}
             {/* <Message message="Hello world" timestamp="19:55" name="Melvin" /> */}
           </div>

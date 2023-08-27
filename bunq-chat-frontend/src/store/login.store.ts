@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { LoginDto } from '../types/login.dto.ts';
 import Environment from '../utils/environment.ts';
 import { User } from './user.store.ts';
+import ApiClient from '../utils/ApiClient.ts';
 
 export interface Login {
   isLoggedIn: boolean;
@@ -19,44 +20,32 @@ const useLoginStore = create<Login>((set) => ({
   accessToken: '',
   refreshToken: '',
   login: async (username: string, password: string) => {
-    const loginResult = await fetch(`${Environment.authApiBaseUrl}/api/auth/login`, {
+    const { execute } = ApiClient({
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ username, password }),
-    })
-      .then((response) => (response.ok ? response.json() : Promise.reject(response)))
-      .then((response: LoginDto) => ({
-        accessToken: response.data.accessToken,
-        refreshToken: response.data.refreshToken,
-        isLoggedIn: true,
-      }))
-      .catch(async (err) => {
-        throw await err.json();
-      });
+      authenticated: false,
+      path: `/api/auth/login`,
+      body: { username, password },
+    });
+    const loginResult = await execute().then((response) => response.data as LoginDto);
+
     localStorage.setItem('accessToken', loginResult.accessToken);
     localStorage.setItem('refreshToken', loginResult.accessToken);
     set({ isLoggedIn: true, accessToken: loginResult.accessToken, refreshToken: loginResult.refreshToken });
   },
   refresh: async () => {
     const refreshToken = localStorage.getItem('refreshToken');
-    const loginResult = await fetch(`${Environment.authApiBaseUrl}/api/auth/refresh`, {
+    if (!refreshToken) {
+      window.location.href = '/logout';
+    }
+
+    const { execute } = ApiClient({
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ refreshToken }),
-    })
-      .then((response) => (response.ok ? response.json() : Promise.reject(response)))
-      .then((response: LoginDto) => ({
-        accessToken: response.data.accessToken,
-        refreshToken: response.data.refreshToken,
-        isLoggedIn: true,
-      }))
-      .catch(async (err) => {
-        throw await err.json();
-      });
+      authenticated: false,
+      path: `/api/auth/refresh`,
+      body: { refreshToken: refreshToken! },
+    });
+    const loginResult = await execute().then((response) => response.data as LoginDto);
+
     localStorage.setItem('accessToken', loginResult.accessToken);
     localStorage.setItem('refreshToken', loginResult.accessToken);
     set({ isLoggedIn: true, accessToken: loginResult.accessToken, refreshToken: loginResult.refreshToken });

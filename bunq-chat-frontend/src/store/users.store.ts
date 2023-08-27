@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { User } from './user.store.ts';
-import Environment from '../utils/environment.ts';
+import ApiClient from '../utils/ApiClient.ts';
 
 export interface Users {
   users: User[];
@@ -10,17 +10,11 @@ export interface Users {
 const useUsersStore = create<Users>((set) => ({
   users: [],
   fetch: async () => {
-    const result = await fetch(`${Environment.apiBaseUrl}/api/user`, {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
-      },
-    })
-      .then((response) => response.json())
-      .then((data) => data.data as User[])
-      .catch((err) => {
-        console.error(err);
-        throw err;
-      });
+    const { execute } = ApiClient({
+      authenticated: true,
+      path: `/api/user`,
+    });
+    const result = (await execute()) as User[];
 
     return set({
       users: result.map(

@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import Environment from '../utils/environment.ts';
+import ApiClient from '../utils/ApiClient.ts';
 
 export interface MessageStore {
   messages: any[];
@@ -9,20 +9,11 @@ export interface MessageStore {
 const useMessageStore = create<MessageStore>((set) => ({
   messages: [],
   fetch: async (conversationId: number) => {
-    const result = await fetch(
-      `${Environment.apiBaseUrl}/api/user/${localStorage.getItem('userId')}/conversation/${conversationId}/message`,
-      {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
-        },
-      },
-    )
-      .then((response) => (response.ok ? response.json() : Promise.reject(response)))
-      .then((data) => data)
-      .catch((err) => {
-        console.error(err);
-        throw err;
-      });
+    const { execute } = ApiClient({
+      authenticated: true,
+      path: `/api/user/${localStorage.getItem('userId')}/conversation/${conversationId}/message`,
+    });
+    const result = await execute();
 
     return set({ messages: result.data });
   },
