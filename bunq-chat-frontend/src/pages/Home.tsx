@@ -9,8 +9,8 @@ import useLoginStore from '../store/login.store.ts';
 import useUsersStore from '../store/users.store.ts';
 
 export default function HomePage() {
-  const { conversation } = useConversationStore((state) => state);
-  const { messages, fetch } = useMessageStore((state) => state);
+  const { conversation, loadingConversation } = useConversationStore((state) => state);
+  const { messages, fetch, clear } = useMessageStore((state) => state);
   const { currentUser } = useLoginStore((state) => state);
   const usersStore = useUsersStore((state) => state);
   const [poll, setPoll] = useState(0);
@@ -23,10 +23,12 @@ export default function HomePage() {
   }
 
   useEffect(() => {
+    clear();
+    clearInterval(poll);
     if (conversation) {
-      fetch(conversation.id);
-      clearInterval(poll);
-      setPoll(setInterval(pollHandler, 3000));
+      fetch(conversation.id).then(() => {
+        setPoll(setInterval(pollHandler, 3000));
+      });
     } else {
       clearInterval(poll);
     }
@@ -38,7 +40,7 @@ export default function HomePage() {
   useEffect(() => {
     const messageBox = messagesRef.current! as HTMLDivElement;
     const messagesContainer = messagesContainerRef.current! as HTMLDivElement;
-    messagesContainer.scrollTo({ top: messageBox.scrollHeight, behavior: 'smooth' });
+    messagesContainer?.scrollTo({ top: messageBox.scrollHeight, behavior: 'smooth' });
   }, [messages]);
 
   useEffect(() => {
@@ -67,7 +69,7 @@ export default function HomePage() {
               </p>
             ) : (
               <ul className="text-black/50 text-sm flex flex-wrap gap-2 w-full block">
-                {conversation.members.map((member) => (
+                {conversation!.members.map((member) => (
                   <li key={member.id}>{member.name}</li>
                 ))}
               </ul>
@@ -76,22 +78,30 @@ export default function HomePage() {
         ) : (
           <div className="flex justify-center items-center text-2xl h-full">Welcome to chat</div>
         )}
+
         <div ref={messagesContainerRef} className="overflow-scroll max-h-[calc(100vh-180px)]">
           <div ref={messagesRef} className="messages min-h-full flex flex-col-reverse justify-end gap-2 p-2 border-b">
-            {messages.map((message) => (
-              <Message
-                name={
-                  message.user_id === currentUser?.id
-                    ? 'You'
-                    : usersStore.users.find((user) => user.id === message.user_id)?.name
-                }
-                message={message.message}
-                timestamp={message.sent_at}
-                isMe={currentUser?.id === message.user_id}
-                key={message.id}
-              />
-            ))}
-            {/* <Message message="Hello world" timestamp="19:55" name="Melvin" /> */}
+            {messages.length > 1 ? (
+              messages.map((message) => (
+                <Message
+                  name={
+                    message.user_id === currentUser?.id
+                      ? 'You'
+                      : usersStore.users.find((user) => user.id === message.user_id)?.name
+                  }
+                  message={message.message}
+                  timestamp={message.sent_at}
+                  isMe={currentUser?.id === message.user_id}
+                  key={message.id}
+                />
+              ))
+            ) : (
+              <>
+                <div className="w-[120px] max-w-2xl h-[50px] rounded bg-gray-400 message me shimmer" />
+                <div className="w-[300px] h-[70px] rounded bg-gray-400 message you shimmer" />
+                <div className="w-[300px] h-[90px] rounded bg-gray-400 message me shimmer" />
+              </>
+            )}
           </div>
         </div>
         {conversation != null && <MessageBox />}

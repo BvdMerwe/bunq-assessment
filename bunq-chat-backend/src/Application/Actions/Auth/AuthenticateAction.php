@@ -29,7 +29,7 @@ class AuthenticateAction extends AuthAction
         $username = $this->getFormData()['username'];
         $password = $this->getFormData()['password'];
         $user = ($this->userRepository->findUserByUsername($username));
-        $verifyPassword = !password_verify($password, $user->getPassword());
+        $verifyPassword = !password_verify($password, $user->getPassword()); // dont use this because API doesn't have passwords
         if ($user == null) {
             $this->logger->warning("Invalid login attempt");
             return $this->respondWithData("Invalid Username or Password", 401);

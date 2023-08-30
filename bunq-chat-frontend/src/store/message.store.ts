@@ -13,6 +13,7 @@ export interface MessageStore {
   fetch: (conversationId: number) => Promise<void>;
   addMessage: (message: Message) => void;
   send: (conversationId: number, message: string) => Promise<Message>;
+  clear: () => void;
 }
 
 const useMessageStore = create<MessageStore>((set) => ({
@@ -53,6 +54,7 @@ const useMessageStore = create<MessageStore>((set) => ({
       sent_at: new Date(result.sent_at ?? ''),
     };
   },
+  clear: () => set({ messages: [] }),
 }));
 
 export default useMessageStore;

@@ -43,3 +43,19 @@ svg, img {
         @apply text-xs text-white/50 ms-2 absolute bottom-2 right-2;
     }
 }
+
+.shimmer {
+    @apply animate-shimmer opacity-20 bg-no-repeat bg-transparent;
+    background-image: linear-gradient(-50deg, transparent 40%, rgba(255,255,255,0.8) 45%, transparent 55%, transparent);
+    background-size: 1000px;
+
+}
+
+@keyframes shimmer {
+    0% {
+        background-position: 0% 0;
+    }
+    100% {
+        background-position: 100% 0;
+    }
+}

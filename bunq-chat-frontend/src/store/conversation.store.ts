@@ -12,6 +12,7 @@ export interface Conversation {
   last_message: Message | null;
 }
 export interface ConversationsState {
+  loadingConversation: boolean;
   conversation: Conversation | null;
   conversations: Conversation[];
   fetchAll: () => Promise<void>;
@@ -21,6 +22,7 @@ export interface ConversationsState {
 }
 
 const useConversationStore = create<ConversationsState>((set) => ({
+  loadingConversation: false,
   conversation: null,
   conversations: [],
   fetchAll: async () => {
@@ -35,14 +37,17 @@ const useConversationStore = create<ConversationsState>((set) => ({
     });
   },
   fetch: async (conversationId) => {
+    set({
+      loadingConversation: true,
+    });
     const { execute } = ApiClient({
       authenticated: true,
       path: `/api/user/${localStorage.getItem('userId')}/conversation/${conversationId}`,
     });
     const result = (await execute()).data as ConversationDto;
-
     return set({
       conversation: conversationBuilder(result),
+      loadingConversation: false,
     });
   },
 

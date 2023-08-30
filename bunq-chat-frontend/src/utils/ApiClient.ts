@@ -14,20 +14,22 @@ interface ApiClientSettings {
   queryParams?: JsonResponse;
 }
 export default function ApiClient(settings: ApiClientSettings) {
-  const fetchOptions = {};
+  const fetchOptions: JsonResponse = {
+    method: settings.method ?? 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      ...(settings.authenticated && { Authorization: `Bearer ${localStorage.getItem('accessToken')}` }),
+      ...settings.headers,
+    },
+    ...(settings.body && { body: JSON.stringify(settings.body) }),
+  };
+
+  if (!settings.baseUrl && Environment.apiBaseUrl.includes('assignment.bunq.com')) {
+    fetchOptions.headers.Authorization = `Bearer bZETmiDKXZhWomQUScDDXpHx9RNcFCOe`;
+  }
   const execute: () => Promise<JsonResponse> = async () =>
     fetch(`${settings.baseUrl ?? Environment.apiBaseUrl}${settings.path}`, {
       ...fetchOptions,
-      method: settings.method ?? 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        ...(Environment.apiBaseUrl.includes('assignment.bunq.com') && {
-          Authorization: `Bearer bZETmiDKXZhWomQUScDDXpHx9RNcFCOe`,
-        }),
-        ...(settings.authenticated && { Authorization: `Bearer ${localStorage.getItem('accessToken')}` }),
-        ...settings.headers,
-      },
-      ...(settings.body && { body: JSON.stringify(settings.body) }),
     })
       .then((response) => (response.ok ? response.json() : Promise.reject(response)))
       .then((data) => data)
