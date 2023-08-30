@@ -20,13 +20,13 @@ return function (ContainerBuilder $containerBuilder) {
     $containerBuilder->addDefinitions([
         AuthenticatedUserRepository::class => \DI\autowire(InMemoryAuthenticatedUserRepository::class),
 //TODO: Uncomment for remote repositories
-//        UserRepository::class => \DI\autowire(RemoteUserRepository::class),
-//        ConversationRepository::class => \DI\autowire(RemoteConversationRepository::class),
-//        MessageRepository::class => \DI\autowire(RemoteMessageRepository::class),
+        UserRepository::class => \DI\autowire(RemoteUserRepository::class),
+        ConversationRepository::class => \DI\autowire(RemoteConversationRepository::class),
+        MessageRepository::class => \DI\autowire(RemoteMessageRepository::class),
 
 //TODO: Uncomment for Database repositories
-        UserRepository::class => \DI\autowire(DatabaseUserRepository::class),
-        ConversationRepository::class => \DI\autowire(DatabaseConversationRepository::class),
-        MessageRepository::class => \DI\autowire(DatabaseMessageRepository::class),
+//        UserRepository::class => \DI\autowire(DatabaseUserRepository::class),
+//        ConversationRepository::class => \DI\autowire(DatabaseConversationRepository::class),
+//        MessageRepository::class => \DI\autowire(DatabaseMessageRepository::class),
     ]);
 };

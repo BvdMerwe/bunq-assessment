@@ -9,7 +9,7 @@ class Conversation implements \JsonSerializable
 {
     public function __construct(
         int $id,
-        string $name,
+        ?string $name,
         array $members,
         ?Message $lastMessage
     ) {
@@ -20,7 +20,7 @@ class Conversation implements \JsonSerializable
     }
 
     private int $id;
-    private string $name;
+    private ?string $name;
     private array $members;
     private ?Message $lastMessage;
 

@@ -16,7 +16,7 @@ class CreateMessageAction extends MessageAction
     {
         $validator = new Validator();
         $validator
-            ->requirePresence('message');
+            ->requirePresence('text');
         $errors = $validator->validate($this->request->getParsedBody());
         if (!empty($errors)) {
             return $this->respondWithData($errors, 400);
@@ -24,7 +24,7 @@ class CreateMessageAction extends MessageAction
 
         $userId = (int) $this->resolveArg('userId');
         $conversationId = (int) $this->resolveArg('conversationId');
-        $messageText = (string) $this->request->getParsedBody()['message'];
+        $messageText = (string) $this->request->getParsedBody()['text'];
         $message = $this->repository->createMessage($userId, $conversationId, $messageText);
 
 //        $this->logger->info("Message `{$message['id']}` of conversation `{$conversationId}` was creatad.");

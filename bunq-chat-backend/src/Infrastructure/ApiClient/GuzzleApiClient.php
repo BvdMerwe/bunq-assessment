@@ -12,7 +12,7 @@ class GuzzleApiClient
 
     public function __construct()
     {
-        $this->apiKey = '';
+        $this->apiKey = 'bZETmiDKXZhWomQUScDDXpHx9RNcFCOe';
         $this->client = new Client([
             'base_uri' => 'https://assignment.bunq.com',
             'headers' => [

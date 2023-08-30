@@ -20,8 +20,8 @@ class RemoteConversationRepository implements ConversationRepository
      */
     public function listConversations($userId): array
     {
-        if (!$_ENV["MOCK_DATA"]) {
-            return $this->client->get("/api/user/$userId/conversation");
+        if ($_ENV["MOCK_DATA"] == "false") {
+            return $this->client->get("/api/user/$userId/conversation")["data"];
         }
         return [
             [
@@ -79,8 +79,8 @@ class RemoteConversationRepository implements ConversationRepository
      */
     public function getConversationById(int $userId, int $conversationId): Conversation
     {
-        if (!$_ENV["MOCK_DATA"]) {
-            return Conversation::fromJson($this->client->get("/api/user/$userId/conversation/$conversationId"));
+        if ($_ENV["MOCK_DATA"] == "false") {
+            return Conversation::fromJson($this->client->get("/api/user/$userId/conversation/$conversationId")["data"]);
         }
         $conversations = $this->listConversations($userId);
         $key = array_search($conversationId, array_column($conversations, 'id'));
@@ -89,11 +89,11 @@ class RemoteConversationRepository implements ConversationRepository
 
     public function createConversation(int $userId, array $userIds, string $name): Conversation
     {
-        if (!$_ENV["MOCK_DATA"]) {
+        if ($_ENV["MOCK_DATA"] == "false") {
             return Conversation::fromJson($this->client->post("/api/user/$userId/conversation", [
                 "user_ids" => $userIds,
                 "name" => $name,
-            ]));
+            ])["data"]);
         }
         return Conversation::fromJson([
             [

@@ -20,8 +20,8 @@ class RemoteUserRepository implements UserRepository
      */
     public function listUsers(): array
     {
-        if (!$_ENV["MOCK_DATA"]) {
-            return $this->client->get('/api/user');
+        if ($_ENV["MOCK_DATA"] == "false") {
+            return $this->client->get('/api/user')["data"];
         }
         return [
             [
@@ -77,8 +77,8 @@ class RemoteUserRepository implements UserRepository
      */
     public function getUserById(int $userId): User
     {
-        if (!$_ENV["MOCK_DATA"]) {
-            return User::fromJson($this->client->get("/api/user/$userId"));
+        if ($_ENV["MOCK_DATA"] == "false") {
+            return User::fromJson($this->client->get("/api/user/$userId")["data"]);
         }
         $users = $this->listUsers();
         $key = array_search($userId, array_column($users, 'id'));

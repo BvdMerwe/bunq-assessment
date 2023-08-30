@@ -6,11 +6,13 @@ import Message from '../components/Message.tsx';
 import useConversationStore from '../store/conversation.store.ts';
 import useMessageStore from '../store/message.store.ts';
 import useLoginStore from '../store/login.store.ts';
+import useUsersStore from '../store/users.store.ts';
 
 export default function HomePage() {
   const { conversation } = useConversationStore((state) => state);
   const { messages, fetch } = useMessageStore((state) => state);
   const { currentUser } = useLoginStore((state) => state);
+  const usersStore = useUsersStore((state) => state);
   const [poll, setPoll] = useState(0);
 
   const messagesRef = useRef(null);
@@ -24,7 +26,7 @@ export default function HomePage() {
     if (conversation) {
       fetch(conversation.id);
       clearInterval(poll);
-      setPoll(setInterval(pollHandler, 2000));
+      setPoll(setInterval(pollHandler, 3000));
     } else {
       clearInterval(poll);
     }
@@ -38,6 +40,10 @@ export default function HomePage() {
     const messagesContainer = messagesContainerRef.current! as HTMLDivElement;
     messagesContainer.scrollTo({ top: messageBox.scrollHeight, behavior: 'smooth' });
   }, [messages]);
+
+  useEffect(() => {
+    usersStore.fetch();
+  }, []);
 
   return (
     <div className="grid grid-cols-[150px_1fr] md:grid-cols-[250px_1fr] h-screen">
@@ -56,7 +62,7 @@ export default function HomePage() {
               <p className="text-black/50 text-sm">
                 Last seen{' '}
                 {conversation.members[0]?.last_seen_at
-                  ? formatDistanceToNow(new Date(conversation.members[0]?.last_seen_at!), { addSuffix: true })
+                  ? formatDistanceToNow(new Date(conversation.members[0]?.last_seen_at), { addSuffix: true })
                   : 'never'}
               </p>
             ) : (
@@ -74,7 +80,11 @@ export default function HomePage() {
           <div ref={messagesRef} className="messages min-h-full flex flex-col-reverse justify-end gap-2 p-2 border-b">
             {messages.map((message) => (
               <Message
-                name={message.user_id === currentUser?.id ? 'You' : 'Them'}
+                name={
+                  message.user_id === currentUser?.id
+                    ? 'You'
+                    : usersStore.users.find((user) => user.id === message.user_id)?.name
+                }
                 message={message.message}
                 timestamp={message.sent_at}
                 isMe={currentUser?.id === message.user_id}

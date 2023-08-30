@@ -15,8 +15,8 @@ class RemoteMessageRepository implements MessageRepository
     }
     public function listMessages(int $userId, int $conversationId): array
     {
-        if (!$_ENV["MOCK_DATA"]) {
-            return $this->client->get("/api/user/$userId/conversation/$conversationId/message");
+        if ($_ENV["MOCK_DATA"] == "false") {
+            return $this->client->get("/api/user/$userId/conversation/$conversationId/message")["data"];
         }
         return [
             [
@@ -114,10 +114,10 @@ class RemoteMessageRepository implements MessageRepository
 
     public function createMessage(int $userId, int $conversationId, string $message): Message
     {
-        if (!$_ENV["MOCK_DATA"]) {
+        if ($_ENV["MOCK_DATA"] == "false") {
             return Message::fromJson($this->client->post("/api/user/$userId/conversation/$conversationId/message", [
                 'text' => $message,
-            ]));
+            ])["data"]);
         }
         return Message::fromJson([
             "id" => 2,

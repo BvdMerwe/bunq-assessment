@@ -16,14 +16,14 @@ class CreateConversationAction extends ConversationAction
     {
         $validator = new Validator();
         $validator
-            ->requirePresence('userIds');
+            ->requirePresence('user_ids');
         $formData = $this->getFormData();
         $errors = $validator->validate($formData ?? []);
         if (!empty($errors)) {
             return $this->respondWithData($errors, 400);
         }
         $userId = (int) $this->resolveArg('userId');
-        $userIds = $formData['userIds'];
+        $userIds = $formData['user_ids'];
         $name = $formData['name'] ?? '';
         $conversations = $this->repository
             ->createConversation($userId, $userIds, $name);

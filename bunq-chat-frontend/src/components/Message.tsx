@@ -6,7 +6,7 @@ interface MessageProps {
   isMe?: boolean;
   message: string;
   timestamp: Date;
-  name: string;
+  name?: string;
 }
 
 export default function Message({ className = '', message, timestamp, isMe = false, name }: MessageProps) {

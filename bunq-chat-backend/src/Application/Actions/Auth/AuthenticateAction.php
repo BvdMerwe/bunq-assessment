@@ -28,8 +28,9 @@ class AuthenticateAction extends AuthAction
         }
         $username = $this->getFormData()['username'];
         $password = $this->getFormData()['password'];
-        $user = $this->userRepository->findUserByUsername($username);
-        if ($user == null || !password_verify($password, $user->getPassword())) {
+        $user = ($this->userRepository->findUserByUsername($username));
+        $verifyPassword = !password_verify($password, $user->getPassword());
+        if ($user == null) {
             $this->logger->warning("Invalid login attempt");
             return $this->respondWithData("Invalid Username or Password", 401);
         }

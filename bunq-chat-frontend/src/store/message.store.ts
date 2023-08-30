@@ -42,7 +42,7 @@ const useMessageStore = create<MessageStore>((set) => ({
       method: 'POST',
       authenticated: true,
       path: `/api/user/${localStorage.getItem('userId')}/conversation/${conversationId}/message`,
-      body: { message },
+      body: { text: message },
     });
     const result = (await execute()).data as MessageDto;
 

@@ -21,6 +21,9 @@ export default function ApiClient(settings: ApiClientSettings) {
       method: settings.method ?? 'GET',
       headers: {
         'Content-Type': 'application/json',
+        ...(Environment.apiBaseUrl.includes('assignment.bunq.com') && {
+          Authorization: `Bearer bZETmiDKXZhWomQUScDDXpHx9RNcFCOe`,
+        }),
         ...(settings.authenticated && { Authorization: `Bearer ${localStorage.getItem('accessToken')}` }),
         ...settings.headers,
       },
@@ -49,6 +52,7 @@ export default function ApiClient(settings: ApiClientSettings) {
           }
           // refresh token expired
           window.location.href = '/logout';
+          throw new Error('Refresh token expired');
         }
         // throw err;
         return Promise.reject(error);

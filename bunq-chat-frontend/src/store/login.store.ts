@@ -26,6 +26,7 @@ const useLoginStore = create<Login>((set) => ({
       authenticated: false,
       path: `/api/auth/login`,
       body: { username, password },
+      baseUrl: Environment.authApiBaseUrl,
     });
     const loginResult = await execute().then((response) => response.data as LoginDto);
 
@@ -44,6 +45,7 @@ const useLoginStore = create<Login>((set) => ({
       authenticated: false,
       path: `/api/auth/refresh`,
       body: { refreshToken: refreshToken! },
+      baseUrl: Environment.authApiBaseUrl,
     });
     const loginResult = await execute().then((response) => response.data as LoginDto);
 
@@ -52,17 +54,12 @@ const useLoginStore = create<Login>((set) => ({
     set({ isLoggedIn: true, accessToken: loginResult.accessToken, refreshToken: loginResult.refreshToken });
   },
   fetchMe: async () => {
-    const currentUser = await fetch(`${Environment.authApiBaseUrl}/api/auth/me`, {
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${localStorage.getItem('accessToken')}`,
-      },
-    })
-      .then((response) => (response.ok ? response.json() : Promise.reject(response)))
-      .then((response) => response.data as User)
-      .catch(async (err) => {
-        throw await err.json();
-      });
+    const { execute } = ApiClient({
+      authenticated: true,
+      path: `/api/auth/me`,
+      baseUrl: Environment.authApiBaseUrl,
+    });
+    const currentUser = await execute().then((response) => response.data as User);
     localStorage.setItem('userId', currentUser.id.toString());
     localStorage.setItem('userName', currentUser.name);
     set({ currentUser });

@@ -67,7 +67,7 @@ const useConversationStore = create<ConversationsState>((set) => ({
       authenticated: true,
       path: `/api/user/${localStorage.getItem('userId')}/conversation`,
       body: {
-        userIds: users.map((u) => u.id),
+        user_ids: users.map((u) => u.id),
         name,
       },
     });
